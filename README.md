@@ -11,7 +11,7 @@ reacts, against a proper baseline. Built with Python, pandas, Plotly and Streaml
 
 **🚀 Coba langsung di browser:** [btc-whale-watch.streamlit.app](https://btc-whale-watch.streamlit.app)
 
-![Linimasa](docs/screenshots/01_linimasa.png)
+![Timeline](docs/screenshots/01_linimasa.png)
 
 ## Kenapa project ini ada?
 
@@ -30,14 +30,14 @@ mencari penyebab di berita, repo ini mencari penyebab di dalam blockchain sendir
 
 | Tab | Isi |
 |---|---|
-| 📈 Linimasa | Harga BTC-USD per 5 menit + gelembung tiap transaksi paus (ukuran = BTC, warna = pola). Hover = ringkasan, klik = kartu detail dengan return sebelum/sesudah dan tautan ke mempool.space. Di bawahnya, BTC yang dipindahkan paus per jam |
-| 📋 Daftar paus | Tabel semua transaksi sesuai filter, bisa diurutkan, tautan ke explorer, unduh CSV |
-| 📊 Dampak ke harga | Rata-rata \|Δ harga\| setelah paus vs baseline per horizon, "siapa bergerak duluan", rata-rata return per pola, jam ramai vs jam sepi dengan korelasi Spearman |
-| 🧭 Cara kerja | Alur data, definisi, daftar keterbatasan |
-| 🎓 Mode belajar | Toggle di sidebar: tiap bagian mendapat penjelasan konsep + potongan kode |
+| 📈 Timeline | Harga BTC-USD per 5 menit + gelembung tiap transaksi paus (ukuran = BTC, warna = pola). Hover = ringkasan, klik = kartu detail dengan return sebelum/sesudah dan tautan ke mempool.space. Di bawahnya, BTC yang dipindahkan paus per jam |
+| 📋 Whale list | Tabel semua transaksi sesuai filter, bisa diurutkan, tautan ke explorer, download CSV |
+| 📊 Price impact | Rata-rata \|Δ harga\| setelah paus vs baseline per horizon, "siapa bergerak duluan", rata-rata return per pola, jam ramai vs jam sepi dengan korelasi Spearman |
+| 🧭 How it works | Alur data, definisi, daftar keterbatasan |
+| 🎓 Learning mode | Toggle di sidebar: tiap bagian mendapat penjelasan konsep + potongan kode |
 
 Sidebar: ambang paus (50–2.000 BTC), rentang jam, filter pola, filter nilai bulat, dan tombol
-**Ambil blok terbaru** yang mengunduh ±1 jam blok terakhir dan melengkapi harga. Tanpa internet,
+**Fetch blok terbaru** yang mengambil ±1 jam blok terakhir dan melengkapi harga. Tanpa internet,
 dashboard memakai dataset tersimpan di `data/`.
 
 ![Dampak ke harga](docs/screenshots/04_dampak_baseline.png)

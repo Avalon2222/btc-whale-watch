@@ -76,24 +76,24 @@ with st.sidebar:
     st.caption("*Someone always moves first.*")
 
     ambang = st.slider(
-        "Ambang paus (BTC)", min_value=50, max_value=2000, value=500, step=50,
+        "Whale threshold (BTC)", min_value=50, max_value=2000, value=500, step=50,
         help="Transaksi dengan total output di bawah angka ini diabaikan. "
              f"Data tersimpan hanya memuat transaksi ≥ {ambil_blok.AMBANG_SIMPAN_BTC:.0f} BTC.",
     )
     st.caption(f"≈ {fmt_usd(ambang * harga_terakhir).replace('$', r'\$')} pada harga terakhir")
 
     total_jam = max(6, int((blok["waktu"].max() - blok["waktu"].min()).total_seconds() // 3600) + 1)
-    jam_terakhir = st.slider("Rentang (jam terakhir dari data)", 6, total_jam, total_jam, step=1)
+    jam_terakhir = st.slider("Range (last hours of data)", 6, total_jam, total_jam, step=1)
 
     pola_dipilih = st.multiselect(
-        "Pola transaksi", list(LABEL_POLA), default=list(LABEL_POLA), format_func=LABEL_POLA.get,
+        "Transaction pattern", list(LABEL_POLA), default=list(LABEL_POLA), format_func=LABEL_POLA.get,
     )
-    hanya_bulat = st.checkbox("Hanya nilai bulat (misalnya tepat 1.000 BTC)", value=False)
-    mode_belajar = st.toggle("🎓 Mode belajar", value=False, help="Tampilkan rumus dan potongan kode di tiap bagian")
+    hanya_bulat = st.checkbox("Round amounts only (e.g. exactly 1,000 BTC)", value=False)
+    mode_belajar = st.toggle("🎓 Learning mode", value=False, help="Tampilkan rumus dan potongan kode di tiap bagian")
 
     st.divider()
-    if st.button("🔄 Ambil blok terbaru (±1 jam)", use_container_width=True):
-        with st.spinner("Mengunduh blok dari mempool.space dan blockchain.info…"):
+    if st.button("🔄 Fetch blok terbaru (±1 jam)", use_container_width=True):
+        with st.spinner("Mengambil blok dari mempool.space dan blockchain.info…"):
             st.session_state["pesan_update"] = perbarui_dari_internet()
         st.rerun()
     if "pesan_update" in st.session_state:
@@ -148,10 +148,10 @@ if paus.empty:
     st.warning("Tidak ada transaksi yang lolos filter. Turunkan ambang atau perlebar rentang.")
     st.stop()
 
-tab_linimasa, tab_daftar, tab_dampak, tab_cara = st.tabs(["📈 Linimasa", "📋 Daftar paus", "📊 Dampak ke harga", "🧭 Cara kerja"])
+tab_linimasa, tab_daftar, tab_dampak, tab_cara = st.tabs(["📈 Timeline", "📋 Whale list", "📊 Price impact", "🧭 How it works"])
 
 # ---------------------------------------------------------------------------
-# Tab 1: Linimasa
+# Tab 1: Timeline
 # ---------------------------------------------------------------------------
 
 with tab_linimasa:
@@ -267,7 +267,7 @@ with tab_daftar:
         },
     )
     st.download_button(
-        "⬇️ Unduh CSV (sesuai filter)", tabel.drop(columns=["tautan"]).to_csv(index=False).encode(),
+        "⬇️ Download CSV (sesuai filter)", tabel.drop(columns=["tautan"]).to_csv(index=False).encode(),
         file_name="transaksi_paus_terfilter.csv", mime="text/csv",
     )
 
