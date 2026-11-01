@@ -53,7 +53,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Buka `http://localhost:8501`. Jalankan tes dengan `python -m pytest tests/ -v`.
+Buka `http://localhost:8501`. Jalankan tes dengan `python -m pytest tests/ -v`. Tes yang sama otomatis jalan di GitHub Actions setiap push dan pull request.
 
 Memperbarui data (butuh internet, tanpa API key):
 
