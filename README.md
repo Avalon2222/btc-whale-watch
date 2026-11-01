@@ -9,6 +9,8 @@
 blockchain.info), lines them up against 5-minute BTC-USD candles, and measures whether price actually
 reacts, against a proper baseline. Built with Python, pandas, Plotly and Streamlit.*
 
+**🚀 Coba langsung di browser:** [btc-whale-watch.streamlit.app](https://btc-whale-watch.streamlit.app)
+
 ![Linimasa](docs/screenshots/01_linimasa.png)
 
 ## Kenapa project ini ada?
