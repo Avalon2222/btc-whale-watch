@@ -5,9 +5,20 @@
 > jujur: setelah paus bergerak, apakah harga ikut bergerak? Atau justru paus yang mengekor harga?
 > Dibangun dengan Python, pandas, Plotly, dan Streamlit.
 
-*Tracks large Bitcoin transactions ("whales") straight from the public blockchain (mempool.space,
-blockchain.info), lines them up against 5-minute BTC-USD candles, and measures whether price actually
-reacts, against a proper baseline. Built with Python, pandas, Plotly and Streamlit.*
+## 🇬🇧 In English
+
+**Someone always moves first.** A dashboard that catches giant Bitcoin transactions ("whales") straight from the public blockchain, lines them up against 5-minute BTC-USD candles, and asks honestly: when a whale moves, does the price follow, or does the whale follow the price?
+
+- **See** every whale as a bubble on the price timeline, with a link to the block explorer.
+- **Measure** price moves 15 minutes, 1 hour, and 4 hours later, against an ordinary-moment baseline.
+- **Classify** transaction patterns and test busy hours vs quiet hours with Spearman correlation.
+- **Fetch** the latest blocks on demand, or run fully offline on the stored dataset.
+
+**Built with:** Python, pandas, NumPy, Plotly, Streamlit  
+**Data:** mempool.space and blockchain.info (on-chain), Coinbase 5-minute BTC-USD candles  
+**Engineering:** pytest suite with CI on GitHub Actions, plus a learning mode with the concepts and code
+
+*The rest of this README is in Indonesian.*
 
 **🚀 Coba langsung di browser:** [btc-whale-watch.streamlit.app](https://btc-whale-watch.streamlit.app)
 
