@@ -82,3 +82,13 @@ def test_ringkas_blok_menjumlahkan_paus():
     assert ringkas["jumlah_tx"] == 3
     assert ringkas["jumlah_paus"] == 2
     assert ringkas["btc_paus"] == pytest.approx(99.5 + 199.9)
+
+
+def test_input_nol_satoshi_tetap_dihitung_dan_value_none_aman():
+    tx = buat_tx("nol", [0, 60], [59.9])
+    tx["out"].append({"value": None, "addr": "kosong"})
+    baris = ambil_blok.ringkas_transaksi(tx, 1_700_000_000, 900000)
+    assert baris["jumlah_input"] == 2
+    assert baris["input_btc"] == pytest.approx(60)
+    assert baris["total_btc"] == pytest.approx(59.9)
+    assert baris["alamat_terbesar"] == "out0"
