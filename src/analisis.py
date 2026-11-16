@@ -189,4 +189,7 @@ def paus_teratas(reaksi: pd.DataFrame, n: int = 10) -> pd.DataFrame:
 
 
 def singkat_txid(txid: str, panjang: int = 8) -> str:
+    """Potong txid panjang jadi `abcd1234…wxyz` supaya muat di tabel."""
+    if not isinstance(txid, str):
+        return "-"
     return f"{txid[:panjang]}…{txid[-4:]}" if len(txid) > panjang + 5 else txid
