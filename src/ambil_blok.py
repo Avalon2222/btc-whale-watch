@@ -40,6 +40,8 @@ PATH_BLOK = FOLDER_DATA / "blok.csv"
 PATH_PAUS = FOLDER_DATA / "transaksi_paus.csv"
 
 SATOSHI = 100_000_000
+# Indeks output "palsu" yang dipakai input coinbase (hadiah penambang).
+N_COINBASE = 0xFFFFFFFF
 # Transaksi di bawah angka ini tidak disimpan ke CSV supaya filenya tetap kecil.
 # Slider di app tidak bisa turun lebih rendah dari ini.
 AMBANG_SIMPAN_BTC = 50.0
@@ -83,12 +85,19 @@ def nilai_bulat(btc: float) -> bool:
 
 def ringkas_transaksi(tx: dict, waktu_blok: int, tinggi: int) -> dict:
     """Ubah satu transaksi mentah (format blockchain.info) menjadi satu baris datar."""
-    outputs = tx.get("out", [])
-    inputs = [i for i in tx.get("inputs", []) if i.get("prev_out") and i["prev_out"].get("value")]
-    total_out = sum(o.get("value", 0) for o in outputs) / SATOSHI
+    outputs = tx.get("out") or []
+    # Input bernilai 0 satoshi tetap input sungguhan; yang dibuang hanya coinbase
+    # (tanpa prev_out, atau prev_out dengan n = 0xFFFFFFFF) dan input tanpa nilai.
+    inputs = [
+        i for i in tx.get("inputs") or []
+        if i.get("prev_out")
+        and i["prev_out"].get("value") is not None
+        and i["prev_out"].get("n") != N_COINBASE
+    ]
+    total_out = sum(o.get("value") or 0 for o in outputs) / SATOSHI
     total_in = sum(i["prev_out"]["value"] for i in inputs) / SATOSHI
-    terbesar = max(outputs, key=lambda o: o.get("value", 0)) if outputs else {}
-    out_terbesar = terbesar.get("value", 0) / SATOSHI
+    terbesar = max(outputs, key=lambda o: o.get("value") or 0) if outputs else {}
+    out_terbesar = (terbesar.get("value") or 0) / SATOSHI
     return {
         "txid": tx["hash"],
         "waktu": datetime.fromtimestamp(waktu_blok, tz=timezone.utc).replace(tzinfo=None),
