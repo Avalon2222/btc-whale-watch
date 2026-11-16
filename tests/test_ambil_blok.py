@@ -92,3 +92,30 @@ def test_input_nol_satoshi_tetap_dihitung_dan_value_none_aman():
     assert baris["input_btc"] == pytest.approx(60)
     assert baris["total_btc"] == pytest.approx(59.9)
     assert baris["alamat_terbesar"] == "out0"
+
+
+def test_perbarui_data_tanpa_n_tx_dan_lewati_blok_lama(tmp_path, monkeypatch):
+    blok_baru = buat_blok([buat_tx("t1", [80], [79.9])], tinggi=900001)
+    del blok_baru["n_tx"]
+    monkeypatch.setattr(
+        ambil_blok, "daftar_blok",
+        lambda batas: [{"tinggi": 900001, "hash": "abc", "waktu": 0}],
+    )
+    monkeypatch.setattr(ambil_blok, "ambil_isi_blok", lambda h: blok_baru)
+    pesan = []
+    blok, paus = ambil_blok.perbarui_data(
+        jam=1, path_blok=tmp_path / "blok.csv", path_paus=tmp_path / "paus.csv",
+        jeda_detik=0, laporkan=pesan.append,
+    )
+    assert list(blok["tinggi"]) == [900001]
+    assert blok.iloc[0]["jumlah_tx"] == 1
+    assert list(paus["txid"]) == ["t1"]
+    assert "1 tx, 1 paus" in pesan[-1]
+
+    # Dijalankan lagi: blok yang sudah ada di CSV tidak diunduh ulang.
+    monkeypatch.setattr(ambil_blok, "ambil_isi_blok", lambda h: pytest.fail("tidak boleh unduh ulang"))
+    blok2, _ = ambil_blok.perbarui_data(
+        jam=1, path_blok=tmp_path / "blok.csv", path_paus=tmp_path / "paus.csv",
+        jeda_detik=0, laporkan=pesan.append,
+    )
+    assert len(blok2) == 1

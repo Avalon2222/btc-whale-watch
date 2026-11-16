@@ -226,7 +226,8 @@ def perbarui_data(
         paus = saring_paus(blok)
         baris_blok.append(ringkas_blok(blok, paus))
         baris_paus.extend(paus)
-        laporkan(f"[{i}/{len(kandidat)}] blok {b['tinggi']}: {blok['n_tx']} tx, {len(paus)} paus")
+        jumlah_tx = baris_blok[-1]["jumlah_tx"]  # n_tx bisa tidak ada di respons
+        laporkan(f"[{i}/{len(kandidat)}] blok {b['tinggi']}: {jumlah_tx} tx, {len(paus)} paus")
         if jeda_detik:
             time.sleep(jeda_detik)
         # Simpan bertahap setiap 10 blok supaya progres tidak hilang.
