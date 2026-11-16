@@ -29,17 +29,21 @@ def harga_pada(harga: pd.DataFrame, waktu: pd.Series) -> pd.Series:
     """Harga close dari candle terakhir yang <= tiap waktu (merge_asof).
 
     Kalau sebuah waktu berada sebelum candle pertama atau setelah candle
-    terakhir, hasilnya NaN. Index hasil mengikuti index `waktu`.
+    terakhir, hasilnya NaN. Waktu yang kosong (NaT) juga menghasilkan NaN.
+    Index hasil mengikuti index `waktu`.
     """
     kiri = pd.DataFrame({"waktu": pd.to_datetime(waktu.values)}, index=waktu.index)
     kiri["_urut"] = range(len(kiri))
-    kiri = kiri.sort_values("waktu")
+    # merge_asof menolak kunci kosong, jadi waktu NaT disisihkan dulu.
+    ada_waktu = kiri["waktu"].notna()
+    kiri = kiri[ada_waktu].sort_values("waktu")
     kanan = harga[["waktu", "close"]].sort_values("waktu")
     hasil = pd.merge_asof(kiri, kanan, on="waktu", direction="backward")
     # Waktu yang melewati candle terakhir dianggap tidak diketahui.
     hasil.loc[hasil["waktu"] > kanan["waktu"].max(), "close"] = float("nan")
-    hasil = hasil.sort_values("_urut")
-    return pd.Series(hasil["close"].values, index=waktu.index)
+    keluaran = pd.Series(float("nan"), index=range(len(waktu)))
+    keluaran[hasil["_urut"].to_numpy()] = hasil["close"].to_numpy()
+    return pd.Series(keluaran.to_numpy(), index=waktu.index)
 
 
 def hitung_reaksi(
