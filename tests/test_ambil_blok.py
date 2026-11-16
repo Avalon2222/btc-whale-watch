@@ -119,3 +119,35 @@ def test_perbarui_data_tanpa_n_tx_dan_lewati_blok_lama(tmp_path, monkeypatch):
         jeda_detik=0, laporkan=pesan.append,
     )
     assert len(blok2) == 1
+
+
+class _Respons:
+    def __init__(self, data):
+        self._data = data
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self._data
+
+
+def test_daftar_blok_berhenti_di_blok_genesis(monkeypatch):
+    # Kalau semua blok lebih baru dari batas, loop harus berhenti di tinggi 0,
+    # bukan meminta /blocks/-1 terus-menerus.
+    halaman = {
+        ambil_blok.URL_MEMPOOL: [{"height": 1, "id": "b1", "timestamp": 200},
+                                 {"height": 0, "id": "b0", "timestamp": 100}],
+    }
+    dipanggil = []
+
+    def palsu(url, headers=None, timeout=None):
+        dipanggil.append(url)
+        if url not in halaman:
+            pytest.fail(f"permintaan tidak terduga: {url}")
+        return _Respons(halaman[url])
+
+    monkeypatch.setattr(ambil_blok.requests, "get", palsu)
+    hasil = ambil_blok.daftar_blok(sampai_waktu=0)
+    assert [b["tinggi"] for b in hasil] == [1, 0]
+    assert dipanggil == [ambil_blok.URL_MEMPOOL]
