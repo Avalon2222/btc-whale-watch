@@ -162,7 +162,10 @@ def daftar_blok(sampai_waktu: int, mulai_tinggi: int | None = None) -> list[dict
             if b["timestamp"] < sampai_waktu:
                 return hasil
             hasil.append({"tinggi": b["height"], "hash": b["id"], "waktu": b["timestamp"]})
-        url = f"{URL_MEMPOOL}/{halaman[-1]['height'] - 1}"
+        berikutnya = halaman[-1]["height"] - 1
+        if berikutnya < 0:  # sudah sampai blok genesis
+            return hasil
+        url = f"{URL_MEMPOOL}/{berikutnya}"
 
 
 def ambil_isi_blok(hash_blok: str, percobaan: int = 3) -> dict:
