@@ -129,3 +129,26 @@ def test_bandingkan_jam_korelasi_sempurna():
 def test_singkat_txid():
     assert analisis.singkat_txid("abcdefghijklmnopqrstuvwxyz") == "abcdefgh…wxyz"
     assert analisis.singkat_txid("pendek") == "pendek"
+
+
+def test_harga_pada_waktu_kosong_jadi_nan_tanpa_mengacak_urutan():
+    harga = buat_harga(jumlah=10)
+    waktu = pd.Series(pd.to_datetime(["2026-01-01 00:20", None, "2026-01-01 00:05"]), index=[7, 8, 9])
+    hasil = analisis.harga_pada(harga, waktu)
+    assert list(hasil.index) == [7, 8, 9]
+    assert hasil.loc[7] == pytest.approx(1004.0)
+    assert pd.isna(hasil.loc[8])
+    assert hasil.loc[9] == pytest.approx(1001.0)
+
+
+def test_hitung_reaksi_paus_tanpa_waktu_tidak_crash():
+    harga = buat_harga()
+    paus = buat_paus(["2026-01-01 02:00", None])
+    r = analisis.hitung_reaksi(paus, harga, horizon=(15,))
+    assert r["harga_saat"].iloc[0] == pytest.approx(1024.0)
+    assert r[["harga_saat", "r_15m_pct"]].iloc[1].isna().all()
+
+
+def test_singkat_txid_bukan_teks():
+    assert analisis.singkat_txid(None) == "-"
+    assert analisis.singkat_txid(float("nan")) == "-"
