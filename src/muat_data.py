@@ -52,6 +52,8 @@ def muat_harga(path: Path = PATH_HARGA) -> pd.DataFrame:
     """Baca candle 5 menit, urut, buang duplikat."""
     df = pd.read_csv(path, parse_dates=["waktu"])
     _periksa_kolom(df, KOLOM_HARGA, path.name)
+    # Candle tanpa waktu atau tanpa harga tidak bisa dipakai merge_asof.
+    df = df.dropna(subset=["waktu", "close"])
     df = df.drop_duplicates("waktu").sort_values("waktu").reset_index(drop=True)
     if (df["close"] <= 0).any():
         raise ValueError(f"{path.name}: ada harga close <= 0")
