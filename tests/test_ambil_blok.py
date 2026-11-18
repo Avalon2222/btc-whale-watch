@@ -151,3 +151,12 @@ def test_daftar_blok_berhenti_di_blok_genesis(monkeypatch):
     hasil = ambil_blok.daftar_blok(sampai_waktu=0)
     assert [b["tinggi"] for b in hasil] == [1, 0]
     assert dipanggil == [ambil_blok.URL_MEMPOOL]
+
+
+def test_saring_paus_aman_untuk_value_none():
+    tx = buat_tx("ada_none", [80], [79.9])
+    tx["out"].append({"value": None, "addr": "kosong"})
+    tanpa_out = {"hash": "tanpa_out", "fee": 0, "inputs": [], "out": None}
+    hasil = ambil_blok.saring_paus(buat_blok([tx, tanpa_out]), ambang_btc=50)
+    assert [p["txid"] for p in hasil] == ["ada_none"]
+    assert hasil[0]["total_btc"] == pytest.approx(79.9)
