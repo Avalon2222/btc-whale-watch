@@ -106,7 +106,7 @@ def ringkas_transaksi(tx: dict, waktu_blok: int, tinggi: int) -> dict:
         "jumlah_output": len(outputs),
         "total_btc": round(total_out, 8),
         "input_btc": round(total_in, 8),
-        "fee_btc": round(tx.get("fee", 0) / SATOSHI, 8),
+        "fee_btc": round((tx.get("fee") or 0) / SATOSHI, 8),
         "output_terbesar_btc": round(out_terbesar, 8),
         "alamat_terbesar": terbesar.get("addr", "") or "",
         "pola": klasifikasi_pola(len(inputs), len(outputs)),
