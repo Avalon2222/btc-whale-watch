@@ -88,7 +88,10 @@ def perbarui_csv(jam: float | None = None, path: Path = PATH_HARGA) -> pd.DataFr
         baru = ambil_candle(mulai, sampai)
 
     df = pd.concat([lama, baru], ignore_index=True)
-    df = df.drop_duplicates("waktu").sort_values("waktu").reset_index(drop=True)
+    # Unduhan baru menang atas candle lama dengan waktu sama (candle lama bisa jadi belum selesai),
+    # dan candle yang masih berjalan tidak disimpan supaya tidak membeku dengan harga setengah jadi.
+    df = df.drop_duplicates("waktu", keep="last").sort_values("waktu")
+    df = df[df["waktu"] + timedelta(minutes=MENIT) <= sekarang].reset_index(drop=True)
     df.to_csv(path, index=False)
     return df
 
