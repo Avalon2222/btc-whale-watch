@@ -139,10 +139,13 @@ def agregasi_per_jam(paus: pd.DataFrame, harga: pd.DataFrame) -> pd.DataFrame:
     Return jam berikutnya dipakai (bukan jam yang sama) supaya urutan sebabnya
     jelas: paus bergerak dulu, baru harga dilihat.
     """
-    per_jam = harga.set_index("waktu")["close"].resample("h").last().dropna()
+    # Jam tanpa candle tetap disimpan (NaN) saat menggeser, supaya "jam berikutnya" benar-benar
+    # satu jam kemudian dan tidak melompati celah data. Baris kosong dibuang setelahnya.
+    per_jam = harga.set_index("waktu")["close"].resample("h").last()
     df = pd.DataFrame({"jam": per_jam.index, "close": per_jam.values})
     df["ret_jam_ini_pct"] = (df["close"] / df["close"].shift(1) - 1) * 100
     df["ret_jam_berikut_pct"] = (df["close"].shift(-1) / df["close"] - 1) * 100
+    df = df.dropna(subset=["close"])
     df["abs_ret_berikut_pct"] = df["ret_jam_berikut_pct"].abs()
 
     if len(paus):
