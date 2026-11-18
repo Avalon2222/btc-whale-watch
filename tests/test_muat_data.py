@@ -45,3 +45,16 @@ def test_kolom_hilang_ditolak(tmp_path):
     pd.DataFrame({"waktu": ["2026-01-01"], "close": [1.0]}).to_csv(path, index=False)
     with pytest.raises(ValueError, match="tidak ditemukan"):
         muat_data.muat_harga(path)
+
+
+def test_bulat_kosong_dianggap_false(tmp_path):
+    df = pd.DataFrame([{k: 0 for k in muat_data.KOLOM_PAUS} for _ in range(2)])
+    df["txid"] = ["a", "b"]
+    df["waktu"] = "2026-01-01 00:00:00"
+    df["pola"] = "transfer"
+    df["bulat"] = [True, None]
+    path = tmp_path / "paus.csv"
+    df.to_csv(path, index=False)
+    hasil = muat_data.muat_paus(path)
+    assert hasil.set_index("txid")["bulat"].to_dict() == {"a": True, "b": False}
+
