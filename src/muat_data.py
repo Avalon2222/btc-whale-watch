@@ -38,9 +38,14 @@ def muat_paus(path: Path = PATH_PAUS, ambang_btc: float = 0.0) -> pd.DataFrame:
     """Baca transaksi paus, urut berdasarkan waktu, saring >= ambang_btc."""
     df = pd.read_csv(path, parse_dates=["waktu"])
     _periksa_kolom(df, KOLOM_PAUS, path.name)
-    salah = set(df["pola"].unique()) - set(POLA_VALID)
+    # Pola dirapikan dulu (spasi, huruf besar) supaya " Transfer" tidak dianggap pola baru.
+    df["pola"] = df["pola"].astype("string").str.strip().str.lower()
+    salah = set(df["pola"].dropna().unique()) - set(POLA_VALID)
+    if df["pola"].isna().any():
+        salah.add("<kosong>")
     if salah:
         raise ValueError(f"{path.name}: pola tidak dikenal {sorted(salah)}; yang boleh {POLA_VALID}")
+    df["pola"] = df["pola"].astype(str)
     df["alamat_terbesar"] = df["alamat_terbesar"].fillna("")
     # NaN.astype(bool) jadi True, jadi nilai kosong diisi False dulu.
     df["bulat"] = df["bulat"].fillna(False).astype(bool)

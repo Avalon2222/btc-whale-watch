@@ -69,3 +69,24 @@ def test_candle_tanpa_waktu_atau_harga_dibuang(tmp_path):
     hasil = muat_data.muat_harga(path)
     assert len(hasil) == 1
     assert hasil["close"].iloc[0] == 100.0
+
+
+def _tulis_paus(tmp_path, pola):
+    df = pd.DataFrame([{k: 0 for k in muat_data.KOLOM_PAUS} for _ in pola])
+    df["txid"] = "a"
+    df["waktu"] = "2026-01-01 00:00:00"
+    df["pola"] = pola
+    path = tmp_path / "paus.csv"
+    df.to_csv(path, index=False)
+    return path
+
+
+def test_pola_dirapikan_dari_spasi_dan_huruf_besar(tmp_path):
+    path = _tulis_paus(tmp_path, [" Transfer", "KONSOLIDASI"])
+    assert list(muat_data.muat_paus(path)["pola"]) == ["transfer", "konsolidasi"]
+
+
+def test_pola_kosong_ditolak_dengan_pesan_jelas(tmp_path):
+    path = _tulis_paus(tmp_path, ["transfer", None, "aneh"])
+    with pytest.raises(ValueError, match="kosong"):
+        muat_data.muat_paus(path)
