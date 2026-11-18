@@ -160,3 +160,10 @@ def test_saring_paus_aman_untuk_value_none():
     hasil = ambil_blok.saring_paus(buat_blok([tx, tanpa_out]), ambang_btc=50)
     assert [p["txid"] for p in hasil] == ["ada_none"]
     assert hasil[0]["total_btc"] == pytest.approx(79.9)
+
+
+def test_fee_none_dianggap_nol():
+    tx = buat_tx("tanpa_fee", [80], [79.9])
+    tx["fee"] = None
+    baris = ambil_blok.ringkas_transaksi(tx, 1_700_000_000, 900000)
+    assert baris["fee_btc"] == 0
