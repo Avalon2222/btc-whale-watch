@@ -122,8 +122,9 @@ def saring_paus(blok: dict, ambang_btc: float = AMBANG_SIMPAN_BTC) -> list[dict]
     praktis tidak pernah lolos.
     """
     hasil = []
-    for tx in blok.get("tx", []):
-        total_out = sum(o.get("value", 0) for o in tx.get("out", [])) / SATOSHI
+    for tx in blok.get("tx") or []:
+        # Samakan dengan ringkas_transaksi: value None atau "out" None dianggap 0.
+        total_out = sum(o.get("value") or 0 for o in tx.get("out") or []) / SATOSHI
         if total_out >= ambang_btc:
             hasil.append(ringkas_transaksi(tx, blok["time"], blok["height"]))
     return hasil
