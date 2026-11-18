@@ -152,3 +152,12 @@ def test_hitung_reaksi_paus_tanpa_waktu_tidak_crash():
 def test_singkat_txid_bukan_teks():
     assert analisis.singkat_txid(None) == "-"
     assert analisis.singkat_txid(float("nan")) == "-"
+
+
+def test_agregasi_per_jam_tidak_melompati_celah_data():
+    harga = buat_harga(jumlah=12 * 6)
+    # Jam 02:00-02:55 hilang dari data: jam 01 tidak punya "jam berikutnya".
+    harga = harga[harga["waktu"].dt.hour != 2]
+    agg = analisis.agregasi_per_jam(buat_paus([]), harga).set_index("jam")
+    assert pd.Timestamp("2026-01-01 01:00") not in agg.index
+    assert pd.Timestamp("2026-01-01 00:00") in agg.index
