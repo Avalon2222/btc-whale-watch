@@ -42,7 +42,8 @@ def muat_paus(path: Path = PATH_PAUS, ambang_btc: float = 0.0) -> pd.DataFrame:
     if salah:
         raise ValueError(f"{path.name}: pola tidak dikenal {sorted(salah)}; yang boleh {POLA_VALID}")
     df["alamat_terbesar"] = df["alamat_terbesar"].fillna("")
-    df["bulat"] = df["bulat"].astype(bool)
+    # NaN.astype(bool) jadi True, jadi nilai kosong diisi False dulu.
+    df["bulat"] = df["bulat"].fillna(False).astype(bool)
     df = df[df["total_btc"] >= ambang_btc]
     return df.sort_values("waktu").reset_index(drop=True)
 
