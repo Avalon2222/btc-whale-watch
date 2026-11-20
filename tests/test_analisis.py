@@ -161,3 +161,14 @@ def test_agregasi_per_jam_tidak_melompati_celah_data():
     agg = analisis.agregasi_per_jam(buat_paus([]), harga).set_index("jam")
     assert pd.Timestamp("2026-01-01 01:00") not in agg.index
     assert pd.Timestamp("2026-01-01 00:00") in agg.index
+
+
+def test_harga_pada_melewati_candle_kosong():
+    harga = pd.DataFrame({
+        "waktu": pd.to_datetime(["2024-01-01 10:00", None, "2024-01-01 10:05", "2024-01-01 10:10"]),
+        "close": [100.0, 999.0, float("nan"), 110.0],
+    })
+    waktu = pd.Series(pd.to_datetime(["2024-01-01 10:07", "2024-01-01 10:10"]))
+    hasil = analisis.harga_pada(harga, waktu)
+    # 10:07 memakai candle valid terakhir (10:00), bukan NaN dari candle 10:05 yang kosong.
+    assert hasil.tolist() == [100.0, 110.0]
