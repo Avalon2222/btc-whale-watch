@@ -30,6 +30,7 @@ def harga_pada(harga: pd.DataFrame, waktu: pd.Series) -> pd.Series:
 
     Kalau sebuah waktu berada sebelum candle pertama atau setelah candle
     terakhir, hasilnya NaN. Waktu yang kosong (NaT) juga menghasilkan NaN.
+    Candle yang waktunya atau harganya kosong dilewati.
     Index hasil mengikuti index `waktu`.
     """
     kiri = pd.DataFrame({"waktu": pd.to_datetime(waktu.values)}, index=waktu.index)
@@ -37,7 +38,9 @@ def harga_pada(harga: pd.DataFrame, waktu: pd.Series) -> pd.Series:
     # merge_asof menolak kunci kosong, jadi waktu NaT disisihkan dulu.
     ada_waktu = kiri["waktu"].notna()
     kiri = kiri[ada_waktu].sort_values("waktu")
-    kanan = harga[["waktu", "close"]].sort_values("waktu")
+    # Candle tanpa waktu membuat merge_asof gagal, dan candle tanpa harga akan "menutupi"
+    # harga valid sebelumnya; keduanya dibuang di sini, tidak hanya di muat_harga.
+    kanan = harga[["waktu", "close"]].dropna().sort_values("waktu")
     hasil = pd.merge_asof(kiri, kanan, on="waktu", direction="backward")
     # Waktu yang melewati candle terakhir dianggap tidak diketahui.
     hasil.loc[hasil["waktu"] > kanan["waktu"].max(), "close"] = float("nan")
