@@ -167,3 +167,8 @@ def test_fee_none_dianggap_nol():
     tx["fee"] = None
     baris = ambil_blok.ringkas_transaksi(tx, 1_700_000_000, 900000)
     assert baris["fee_btc"] == 0
+
+
+@pytest.mark.parametrize("nilai", [float("nan"), float("inf"), None])
+def test_nilai_bulat_bukan_angka(nilai):
+    assert ambil_blok.nilai_bulat(nilai) is False

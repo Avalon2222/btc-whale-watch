@@ -80,7 +80,10 @@ def nilai_bulat(btc: float) -> bool:
     Transfer internal kustodian sering memakai angka bulat; transaksi orang
     biasa hampir tidak pernah, karena sisa kembalian membuat angkanya pecahan.
     """
-    return abs(btc - round(btc)) < 1e-6
+    try:
+        return abs(btc - round(btc)) < 1e-6
+    except (TypeError, ValueError, OverflowError):  # NaN, inf, atau None bukan angka bulat
+        return False
 
 
 def ringkas_transaksi(tx: dict, waktu_blok: int, tinggi: int) -> dict:
