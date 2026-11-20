@@ -172,3 +172,10 @@ def test_fee_none_dianggap_nol():
 @pytest.mark.parametrize("nilai", [float("nan"), float("inf"), None])
 def test_nilai_bulat_bukan_angka(nilai):
     assert ambil_blok.nilai_bulat(nilai) is False
+
+
+def test_ringkas_blok_n_tx_dan_tx_null():
+    dasar = {"height": 900_000, "hash": "abc", "time": 1_700_000_000}
+    assert ambil_blok.ringkas_blok({**dasar, "tx": None}, [])["jumlah_tx"] == 0
+    assert ambil_blok.ringkas_blok({**dasar, "n_tx": None, "tx": [{}, {}]}, [])["jumlah_tx"] == 2
+    assert ambil_blok.ringkas_blok({**dasar, "n_tx": 3000, "tx": None}, [])["jumlah_tx"] == 3000

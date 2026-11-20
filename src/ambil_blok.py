@@ -138,7 +138,8 @@ def ringkas_blok(blok: dict, paus: list[dict]) -> dict:
         "tinggi": blok["height"],
         "hash": blok["hash"],
         "waktu": datetime.fromtimestamp(blok["time"], tz=timezone.utc).replace(tzinfo=None),
-        "jumlah_tx": blok.get("n_tx", len(blok.get("tx", []))),
+        # n_tx atau tx bisa ada tetapi bernilai null di respons API.
+        "jumlah_tx": blok["n_tx"] if blok.get("n_tx") is not None else len(blok.get("tx") or []),
         "jumlah_paus": len(paus),
         "btc_paus": round(sum(p["total_btc"] for p in paus), 8),
     }
