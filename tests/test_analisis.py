@@ -172,3 +172,16 @@ def test_harga_pada_melewati_candle_kosong():
     hasil = analisis.harga_pada(harga, waktu)
     # 10:07 memakai candle valid terakhir (10:00), bukan NaN dari candle 10:05 yang kosong.
     assert hasil.tolist() == [100.0, 110.0]
+
+
+def test_harga_pada_waktu_berzona():
+    harga = buat_harga(jumlah=10)
+    harga_utc = harga.assign(waktu=harga["waktu"].dt.tz_localize("UTC"))
+    waktu = pd.Series(pd.to_datetime(["2026-01-01 07:10"]).tz_localize("Asia/Jakarta"))
+    # 07:10 WIB = 00:10 UTC -> candle ketiga (close 1002)
+    assert harga_pada_list(harga_utc, waktu) == [1002.0]
+    assert harga_pada_list(harga, waktu) == [1002.0]
+
+
+def harga_pada_list(harga, waktu):
+    return analisis.harga_pada(harga, waktu).tolist()
