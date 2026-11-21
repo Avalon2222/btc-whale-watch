@@ -90,3 +90,15 @@ def test_pola_kosong_ditolak_dengan_pesan_jelas(tmp_path):
     path = _tulis_paus(tmp_path, ["transfer", None, "aneh"])
     with pytest.raises(ValueError, match="kosong"):
         muat_data.muat_paus(path)
+
+
+def test_txid_ganda_hanya_dihitung_sekali(tmp_path):
+    df = pd.DataFrame([{k: 0 for k in muat_data.KOLOM_PAUS} for _ in range(3)])
+    df["txid"] = ["a", "a", "b"]
+    df["waktu"] = "2026-01-01 00:00:00"
+    df["pola"] = "transfer"
+    df["total_btc"] = 100.0
+    path = tmp_path / "paus.csv"
+    df.to_csv(path, index=False)
+    hasil = muat_data.muat_paus(path)
+    assert sorted(hasil["txid"]) == ["a", "b"]
