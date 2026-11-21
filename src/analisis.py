@@ -157,6 +157,8 @@ def agregasi_per_jam(paus: pd.DataFrame, harga: pd.DataFrame) -> pd.DataFrame:
     """
     # Jam tanpa candle tetap disimpan (NaN) saat menggeser, supaya "jam berikutnya" benar-benar
     # satu jam kemudian dan tidak melompati celah data. Baris kosong dibuang setelahnya.
+    # Zona waktu disamakan dulu, kalau tidak merge paus (ber-zona) dengan harga (naif) gagal.
+    harga = harga.assign(waktu=_naif_utc(harga["waktu"]))
     per_jam = harga.set_index("waktu")["close"].resample("h").last()
     df = pd.DataFrame({"jam": per_jam.index, "close": per_jam.values})
     df["ret_jam_ini_pct"] = (df["close"] / df["close"].shift(1) - 1) * 100
@@ -165,7 +167,7 @@ def agregasi_per_jam(paus: pd.DataFrame, harga: pd.DataFrame) -> pd.DataFrame:
     df["abs_ret_berikut_pct"] = df["ret_jam_berikut_pct"].abs()
 
     if len(paus):
-        p = paus.assign(jam=paus["waktu"].dt.floor("h"))
+        p = paus.assign(jam=_naif_utc(paus["waktu"]).dt.floor("h"))
         agg = p.groupby("jam").agg(jumlah_paus=("txid", "size"), btc_paus=("total_btc", "sum"))
         df = df.merge(agg, left_on="jam", right_index=True, how="left")
     else:
