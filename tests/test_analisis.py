@@ -185,3 +185,12 @@ def test_harga_pada_waktu_berzona():
 
 def harga_pada_list(harga, waktu):
     return analisis.harga_pada(harga, waktu).tolist()
+
+
+def test_agregasi_per_jam_paus_berzona_harga_naif():
+    harga = buat_harga(jumlah=48)  # 4 jam, naif (UTC)
+    paus = buat_paus(["2026-01-01 07:30"], total_btc=[500.0])
+    paus["waktu"] = paus["waktu"].dt.tz_localize("Asia/Jakarta")  # = 00:30 UTC
+    hasil = analisis.agregasi_per_jam(paus, harga)
+    jam_paus = hasil.loc[hasil["jumlah_paus"] > 0, "jam"].tolist()
+    assert jam_paus == [pd.Timestamp("2026-01-01 00:00")]
