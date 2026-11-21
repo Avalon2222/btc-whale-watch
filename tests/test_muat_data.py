@@ -73,7 +73,7 @@ def test_candle_tanpa_waktu_atau_harga_dibuang(tmp_path):
 
 def _tulis_paus(tmp_path, pola):
     df = pd.DataFrame([{k: 0 for k in muat_data.KOLOM_PAUS} for _ in pola])
-    df["txid"] = "a"
+    df["txid"] = [f"t{i}" for i in range(len(pola))]
     df["waktu"] = "2026-01-01 00:00:00"
     df["pola"] = pola
     path = tmp_path / "paus.csv"
