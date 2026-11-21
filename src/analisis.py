@@ -25,6 +25,18 @@ SEBELUM_MENIT = 60
 # 1. Harga pada waktu tertentu dan reaksi setelahnya
 # ---------------------------------------------------------------------------
 
+def _naif_utc(waktu: pd.Series) -> pd.Series:
+    """Samakan zona waktu: waktu ber-zona diubah ke UTC tanpa zona, waktu naif dibiarkan.
+
+    merge_asof menolak gabungan kolom ber-zona dan naif, dan `.values` diam-diam membuang zona,
+    sehingga paus ber-zona dan harga ber-zona pun dulu gagal digabung.
+    """
+    waktu = pd.to_datetime(waktu)
+    if getattr(waktu.dt, "tz", None) is not None:
+        waktu = waktu.dt.tz_convert("UTC").dt.tz_localize(None)
+    return waktu
+
+
 def harga_pada(harga: pd.DataFrame, waktu: pd.Series) -> pd.Series:
     """Harga close dari candle terakhir yang <= tiap waktu (merge_asof).
 
@@ -33,14 +45,15 @@ def harga_pada(harga: pd.DataFrame, waktu: pd.Series) -> pd.Series:
     Candle yang waktunya atau harganya kosong dilewati.
     Index hasil mengikuti index `waktu`.
     """
-    kiri = pd.DataFrame({"waktu": pd.to_datetime(waktu.values)}, index=waktu.index)
+    kiri = pd.DataFrame({"waktu": _naif_utc(waktu).to_numpy()}, index=waktu.index)
     kiri["_urut"] = range(len(kiri))
     # merge_asof menolak kunci kosong, jadi waktu NaT disisihkan dulu.
     ada_waktu = kiri["waktu"].notna()
     kiri = kiri[ada_waktu].sort_values("waktu")
     # Candle tanpa waktu membuat merge_asof gagal, dan candle tanpa harga akan "menutupi"
     # harga valid sebelumnya; keduanya dibuang di sini, tidak hanya di muat_harga.
-    kanan = harga[["waktu", "close"]].dropna().sort_values("waktu")
+    kanan = harga[["waktu", "close"]].dropna()
+    kanan = kanan.assign(waktu=_naif_utc(kanan["waktu"])).sort_values("waktu")
     hasil = pd.merge_asof(kiri, kanan, on="waktu", direction="backward")
     # Waktu yang melewati candle terakhir dianggap tidak diketahui.
     hasil.loc[hasil["waktu"] > kanan["waktu"].max(), "close"] = float("nan")
