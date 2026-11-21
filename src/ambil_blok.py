@@ -222,7 +222,9 @@ def perbarui_data(
     """
     df_blok = _muat_atau_kosong(path_blok, KOLOM_BLOK)
     df_paus = _muat_atau_kosong(path_paus, KOLOM_PAUS)
-    sudah = set(df_blok["tinggi"].astype(int)) if len(df_blok) else set()
+    # Baris tanpa tinggi (CSV rusak/diedit tangan) dilewati; astype(int) pada NaN akan gagal.
+    tinggi_ada = pd.to_numeric(df_blok["tinggi"], errors="coerce").dropna() if len(df_blok) else []
+    sudah = {int(t) for t in tinggi_ada}
 
     batas = int(time.time() - jam * 3600)
     kandidat = [b for b in daftar_blok(batas) if b["tinggi"] not in sudah]
