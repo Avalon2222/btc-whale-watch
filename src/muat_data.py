@@ -50,6 +50,8 @@ def muat_paus(path: Path = PATH_PAUS, ambang_btc: float = 0.0) -> pd.DataFrame:
     # NaN.astype(bool) jadi True, jadi nilai kosong diisi False dulu.
     df["bulat"] = df["bulat"].fillna(False).astype(bool)
     df = df[df["total_btc"] >= ambang_btc]
+    # txid yang sama tercatat dua kali (misalnya hasil gabung CSV manual) tidak boleh dihitung ganda.
+    df = df.drop_duplicates("txid")
     return df.sort_values("waktu").reset_index(drop=True)
 
 
