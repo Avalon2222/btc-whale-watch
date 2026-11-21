@@ -6,6 +6,7 @@ Blok palsu di bawah meniru format JSON blockchain.info, hanya field yang
 dipakai. Nilai dalam satoshi (1 BTC = 100.000.000 satoshi).
 """
 
+import pandas as pd
 import pytest
 
 from src import ambil_blok
@@ -179,3 +180,15 @@ def test_ringkas_blok_n_tx_dan_tx_null():
     assert ambil_blok.ringkas_blok({**dasar, "tx": None}, [])["jumlah_tx"] == 0
     assert ambil_blok.ringkas_blok({**dasar, "n_tx": None, "tx": [{}, {}]}, [])["jumlah_tx"] == 2
     assert ambil_blok.ringkas_blok({**dasar, "n_tx": 3000, "tx": None}, [])["jumlah_tx"] == 3000
+
+
+def test_perbarui_data_csv_blok_dengan_tinggi_kosong(tmp_path, monkeypatch):
+    path_blok = tmp_path / "blok.csv"
+    pd.DataFrame(
+        [{"tinggi": None, "hash": "x", "waktu": "2026-01-01 00:00:00", "jumlah_tx": 1, "jumlah_paus": 0, "btc_paus": 0.0}]
+    ).to_csv(path_blok, index=False)
+    monkeypatch.setattr(ambil_blok, "daftar_blok", lambda batas: [])
+    blok, _ = ambil_blok.perbarui_data(
+        jam=1, path_blok=path_blok, path_paus=tmp_path / "paus.csv", jeda_detik=0, laporkan=lambda _: None,
+    )
+    assert len(blok) == 1
