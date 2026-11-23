@@ -194,3 +194,17 @@ def test_agregasi_per_jam_paus_berzona_harga_naif():
     hasil = analisis.agregasi_per_jam(paus, harga)
     jam_paus = hasil.loc[hasil["jumlah_paus"] > 0, "jam"].tolist()
     assert jam_paus == [pd.Timestamp("2026-01-01 00:00")]
+
+
+def test_harga_pada_resolusi_waktu_berbeda():
+    harga = buat_harga(10)
+    harga["waktu"] = harga["waktu"].dt.as_unit("ns")
+    waktu = pd.Series(pd.to_datetime(["2026-01-01 00:07"]).as_unit("s"))
+    assert analisis.harga_pada(harga, waktu).tolist() == [1001.0]
+
+
+def test_hitung_reaksi_harga_kosong_jadi_nan():
+    paus = buat_paus(["2026-01-01 00:10"])
+    kosong = pd.DataFrame({"waktu": pd.to_datetime([]), "close": pd.Series([], dtype=float)})
+    hasil = analisis.hitung_reaksi(paus, kosong)
+    assert hasil["harga_saat"].isna().all()

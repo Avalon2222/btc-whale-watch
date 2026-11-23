@@ -34,7 +34,9 @@ def _naif_utc(waktu: pd.Series) -> pd.Series:
     waktu = pd.to_datetime(waktu)
     if getattr(waktu.dt, "tz", None) is not None:
         waktu = waktu.dt.tz_convert("UTC").dt.tz_localize(None)
-    return waktu
+    # Resolusi juga disamakan: merge_asof menolak gabungan datetime64[s] dengan [us]/[ns],
+    # padahal CSV, datetime Python, dan date_range bisa menghasilkan resolusi berbeda.
+    return waktu.dt.as_unit("us")
 
 
 def harga_pada(harga: pd.DataFrame, waktu: pd.Series) -> pd.Series:
