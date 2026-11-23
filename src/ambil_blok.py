@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import argparse
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
@@ -103,7 +103,7 @@ def ringkas_transaksi(tx: dict, waktu_blok: int, tinggi: int) -> dict:
     out_terbesar = (terbesar.get("value") or 0) / SATOSHI
     return {
         "txid": tx["hash"],
-        "waktu": datetime.fromtimestamp(waktu_blok, tz=timezone.utc).replace(tzinfo=None),
+        "waktu": datetime.fromtimestamp(waktu_blok, tz=UTC).replace(tzinfo=None),
         "tinggi_blok": tinggi,
         "jumlah_input": len(inputs),
         "jumlah_output": len(outputs),
@@ -137,7 +137,7 @@ def ringkas_blok(blok: dict, paus: list[dict]) -> dict:
     return {
         "tinggi": blok["height"],
         "hash": blok["hash"],
-        "waktu": datetime.fromtimestamp(blok["time"], tz=timezone.utc).replace(tzinfo=None),
+        "waktu": datetime.fromtimestamp(blok["time"], tz=UTC).replace(tzinfo=None),
         # n_tx atau tx bisa ada tetapi bernilai null di respons API.
         "jumlah_tx": blok["n_tx"] if blok.get("n_tx") is not None else len(blok.get("tx") or []),
         "jumlah_paus": len(paus),

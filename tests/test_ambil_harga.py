@@ -1,6 +1,6 @@
 """Tes untuk src/ambil_harga.py tanpa internet: ambil_candle diganti data palsu."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
@@ -13,7 +13,7 @@ def _candle(waktu, close):
 
 
 def test_perbarui_csv_tidak_menyimpan_candle_yang_belum_selesai(tmp_path, monkeypatch):
-    sekarang = datetime.now(tz=timezone.utc).replace(tzinfo=None, second=0, microsecond=0)
+    sekarang = datetime.now(tz=UTC).replace(tzinfo=None, second=0, microsecond=0)
     selesai = sekarang - timedelta(minutes=10)
     berjalan = sekarang - timedelta(minutes=2)
     monkeypatch.setattr(ambil_harga, "ambil_candle",
@@ -24,7 +24,7 @@ def test_perbarui_csv_tidak_menyimpan_candle_yang_belum_selesai(tmp_path, monkey
 
 
 def test_perbarui_csv_unduhan_baru_menimpa_candle_lama(tmp_path, monkeypatch):
-    sekarang = datetime.now(tz=timezone.utc).replace(tzinfo=None, second=0, microsecond=0)
+    sekarang = datetime.now(tz=UTC).replace(tzinfo=None, second=0, microsecond=0)
     t = sekarang - timedelta(hours=1)
     path = tmp_path / "harga.csv"
     _candle([t], [50.0]).to_csv(path, index=False)
