@@ -208,7 +208,10 @@ def bandingkan_jam(agg: pd.DataFrame) -> dict:
 # ---------------------------------------------------------------------------
 
 def paus_teratas(reaksi: pd.DataFrame, n: int = 10) -> pd.DataFrame:
-    return reaksi.sort_values("total_btc", ascending=False).head(n).reset_index(drop=True)
+    # head(-n) justru mengembalikan hampir semua paus; batas negatif dianggap nol.
+    # mergesort menjaga urutan asal (waktu) untuk paus dengan total BTC yang sama.
+    urut = reaksi.sort_values("total_btc", ascending=False, kind="mergesort")
+    return urut.head(max(n, 0)).reset_index(drop=True)
 
 
 def singkat_txid(txid: str, panjang: int = 8) -> str:

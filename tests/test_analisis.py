@@ -208,3 +208,11 @@ def test_hitung_reaksi_harga_kosong_jadi_nan():
     kosong = pd.DataFrame({"waktu": pd.to_datetime([]), "close": pd.Series([], dtype=float)})
     hasil = analisis.hitung_reaksi(paus, kosong)
     assert hasil["harga_saat"].isna().all()
+
+
+def test_paus_teratas_batas_negatif_dan_seri():
+    waktu = pd.date_range("2026-01-01", periods=60, freq="10min")
+    paus = buat_paus(waktu, total_btc=[100.0 + (i % 3) for i in range(60)])
+    assert analisis.paus_teratas(paus, n=-2).empty
+    teratas = analisis.paus_teratas(paus, n=5)
+    assert teratas["txid"].tolist() == ["tx2", "tx5", "tx8", "tx11", "tx14"]
