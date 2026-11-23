@@ -121,7 +121,7 @@ def ringkasan_reaksi(
         base_abs = b.abs().mean() if len(b) else float("nan")
         baris.append({
             "horizon_menit": h,
-            "jumlah": int(len(r)),
+            "jumlah": len(r),
             "rata_rata_pct": r.mean() if len(r) else float("nan"),
             "median_pct": r.median() if len(r) else float("nan"),
             "persen_naik": (r > 0).mean() * 100 if len(r) else float("nan"),
@@ -195,8 +195,8 @@ def bandingkan_jam(agg: pd.DataFrame) -> dict:
     else:
         korelasi = float("nan")
     return {
-        "jam_ada_paus": int(len(ada)),
-        "jam_tanpa_paus": int(len(tidak)),
+        "jam_ada_paus": len(ada),
+        "jam_tanpa_paus": len(tidak),
         "abs_ret_ada_paus": ada["abs_ret_berikut_pct"].mean() if len(ada) else float("nan"),
         "abs_ret_tanpa_paus": tidak["abs_ret_berikut_pct"].mean() if len(tidak) else float("nan"),
         "korelasi_spearman": korelasi,

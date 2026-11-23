@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import argparse
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -65,7 +65,7 @@ def perbarui_csv(jam: float | None = None, path: Path = PATH_HARGA) -> pd.DataFr
 
     Kalau `jam` diisi, rentangnya dihitung dari sekarang ke belakang.
     """
-    sekarang = datetime.now(tz=timezone.utc).replace(tzinfo=None, second=0, microsecond=0)
+    sekarang = datetime.now(tz=UTC).replace(tzinfo=None, second=0, microsecond=0)
     if jam is not None:
         mulai, sampai = sekarang - timedelta(hours=jam), sekarang
     elif PATH_BLOK.exists():
