@@ -216,3 +216,9 @@ def test_paus_teratas_batas_negatif_dan_seri():
     assert analisis.paus_teratas(paus, n=-2).empty
     teratas = analisis.paus_teratas(paus, n=5)
     assert teratas["txid"].tolist() == ["tx2", "tx5", "tx8", "tx11", "tx14"]
+
+
+def test_singkat_txid_panjang_negatif():
+    txid = "abcdef0123456789abcdef"
+    assert analisis.singkat_txid(txid, panjang=-3) == "a…cdef"
+    assert analisis.singkat_txid(txid, panjang=0) == "a…cdef"
