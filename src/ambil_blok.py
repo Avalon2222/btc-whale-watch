@@ -204,7 +204,9 @@ def _gabung(lama: pd.DataFrame, baru: list[dict], kunci: str, kolom: list[str]) 
     if not baru:
         return lama
     df = pd.concat([lama, pd.DataFrame(baru)], ignore_index=True)
-    df = df.drop_duplicates(kunci).sort_values("waktu").reset_index(drop=True)
+    # Banyak transaksi dalam satu blok punya waktu yang sama; mergesort menjaga urutan aslinya
+    # supaya CSV tidak teracak setiap kali diperbarui.
+    df = df.drop_duplicates(kunci).sort_values("waktu", kind="mergesort").reset_index(drop=True)
     return df[kolom]
 
 
