@@ -192,3 +192,14 @@ def test_perbarui_data_csv_blok_dengan_tinggi_kosong(tmp_path, monkeypatch):
         jam=1, path_blok=path_blok, path_paus=tmp_path / "paus.csv", jeda_detik=0, laporkan=lambda _: None,
     )
     assert len(blok) == 1
+
+
+def test_gabung_waktu_sama_urutan_tetap():
+    kosong = {k: 0 for k in ambil_blok.KOLOM_PAUS if k not in ("txid", "waktu")}
+    baru = [
+        {"txid": f"t{i:03d}", "waktu": pd.Timestamp("2026-01-01") + pd.Timedelta(minutes=10 * (i % 3)), **kosong}
+        for i in range(120)
+    ]
+    df = ambil_blok._gabung(pd.DataFrame(columns=ambil_blok.KOLOM_PAUS), baru, "txid", ambil_blok.KOLOM_PAUS)
+    harapan = [r["txid"] for r in sorted(baru, key=lambda r: r["waktu"])]
+    assert df["txid"].tolist() == harapan
