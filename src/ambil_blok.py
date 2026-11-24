@@ -196,7 +196,11 @@ def ambil_isi_blok(hash_blok: str, percobaan: int = 3) -> dict:
 
 def _muat_atau_kosong(path: Path, kolom: list[str]) -> pd.DataFrame:
     if path.exists():
-        return pd.read_csv(path, parse_dates=["waktu"])
+        try:
+            return pd.read_csv(path, parse_dates=["waktu"])
+        except pd.errors.EmptyDataError:
+            # File 0 byte (misalnya penulisan terputus) diperlakukan seperti belum ada data.
+            pass
     return pd.DataFrame(columns=kolom)
 
 
