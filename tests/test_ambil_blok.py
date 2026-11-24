@@ -203,3 +203,11 @@ def test_gabung_waktu_sama_urutan_tetap():
     df = ambil_blok._gabung(pd.DataFrame(columns=ambil_blok.KOLOM_PAUS), baru, "txid", ambil_blok.KOLOM_PAUS)
     harapan = [r["txid"] for r in sorted(baru, key=lambda r: r["waktu"])]
     assert df["txid"].tolist() == harapan
+
+
+def test_muat_atau_kosong_file_nol_byte(tmp_path):
+    path = tmp_path / "blok.csv"
+    path.write_text("")
+    df = ambil_blok._muat_atau_kosong(path, ambil_blok.KOLOM_BLOK)
+    assert df.empty
+    assert list(df.columns) == ambil_blok.KOLOM_BLOK
