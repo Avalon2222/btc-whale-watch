@@ -52,7 +52,8 @@ def muat_paus(path: Path = PATH_PAUS, ambang_btc: float = 0.0) -> pd.DataFrame:
     df = df[df["total_btc"] >= ambang_btc]
     # txid yang sama tercatat dua kali (misalnya hasil gabung CSV manual) tidak boleh dihitung ganda.
     df = df.drop_duplicates("txid")
-    return df.sort_values("waktu").reset_index(drop=True)
+    # Transaksi dari blok yang sama berbagi waktu; mergesort menjaga urutan di CSV.
+    return df.sort_values("waktu", kind="mergesort").reset_index(drop=True)
 
 
 def muat_harga(path: Path = PATH_HARGA) -> pd.DataFrame:

@@ -102,3 +102,16 @@ def test_txid_ganda_hanya_dihitung_sekali(tmp_path):
     df.to_csv(path, index=False)
     hasil = muat_data.muat_paus(path)
     assert sorted(hasil["txid"]) == ["a", "b"]
+
+
+def test_paus_waktu_sama_urutan_csv_tetap(tmp_path):
+    baris = []
+    for i in range(120):
+        r = {k: 0 for k in muat_data.KOLOM_PAUS}
+        r.update(txid=f"t{i:03d}", waktu=f"2026-01-01 00:{10 * (i % 3):02d}:00", pola="transfer", total_btc=100)
+        baris.append(r)
+    path = tmp_path / "paus.csv"
+    pd.DataFrame(baris).to_csv(path, index=False)
+    hasil = muat_data.muat_paus(path)
+    harapan = [r["txid"] for r in sorted(baris, key=lambda r: r["waktu"])]
+    assert hasil["txid"].tolist() == harapan
