@@ -211,3 +211,14 @@ def test_muat_atau_kosong_file_nol_byte(tmp_path):
     df = ambil_blok._muat_atau_kosong(path, ambil_blok.KOLOM_BLOK)
     assert df.empty
     assert list(df.columns) == ambil_blok.KOLOM_BLOK
+
+
+def test_input_null_dilewati():
+    tx = {
+        "hash": "x",
+        "inputs": [None, {"prev_out": {"value": 60 * ambil_blok.SATOSHI, "n": 0}}],
+        "out": [{"value": 60 * ambil_blok.SATOSHI}],
+    }
+    baris = ambil_blok.ringkas_transaksi(tx, 1_700_000_000, 1)
+    assert baris["jumlah_input"] == 1
+    assert baris["input_btc"] == 60.0
