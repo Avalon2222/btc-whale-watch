@@ -222,3 +222,11 @@ def test_input_null_dilewati():
     baris = ambil_blok.ringkas_transaksi(tx, 1_700_000_000, 1)
     assert baris["jumlah_input"] == 1
     assert baris["input_btc"] == 60.0
+
+
+def test_output_null_dilewati():
+    blok = {"time": 1_700_000_000, "height": 5, "tx": [{"hash": "x", "inputs": [], "out": [None, {"value": 60 * ambil_blok.SATOSHI}]}]}
+    paus = ambil_blok.saring_paus(blok)
+    assert len(paus) == 1
+    assert paus[0]["jumlah_output"] == 1
+    assert paus[0]["total_btc"] == 60.0

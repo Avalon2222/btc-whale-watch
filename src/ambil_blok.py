@@ -88,7 +88,8 @@ def nilai_bulat(btc: float) -> bool:
 
 def ringkas_transaksi(tx: dict, waktu_blok: int, tinggi: int) -> dict:
     """Ubah satu transaksi mentah (format blockchain.info) menjadi satu baris datar."""
-    outputs = tx.get("out") or []
+    # Output null di respons API dibuang dulu; kalau tidak, o.get(...) gagal.
+    outputs = [o for o in tx.get("out") or [] if isinstance(o, dict)]
     # Input bernilai 0 satoshi tetap input sungguhan; yang dibuang hanya coinbase
     # (tanpa prev_out, atau prev_out dengan n = 0xFFFFFFFF) dan input tanpa nilai.
     inputs = [
@@ -129,7 +130,7 @@ def saring_paus(blok: dict, ambang_btc: float = AMBANG_SIMPAN_BTC) -> list[dict]
     hasil = []
     for tx in blok.get("tx") or []:
         # Samakan dengan ringkas_transaksi: value None atau "out" None dianggap 0.
-        total_out = sum(o.get("value") or 0 for o in tx.get("out") or []) / SATOSHI
+        total_out = sum(o.get("value") or 0 for o in tx.get("out") or [] if isinstance(o, dict)) / SATOSHI
         if total_out >= ambang_btc:
             hasil.append(ringkas_transaksi(tx, blok["time"], blok["height"]))
     return hasil
