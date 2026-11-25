@@ -61,6 +61,8 @@ def muat_harga(path: Path = PATH_HARGA) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=["waktu"])
     _periksa_kolom(df, KOLOM_HARGA, path.name)
     # Candle tanpa waktu atau tanpa harga tidak bisa dipakai merge_asof.
+    # Harga inf juga dianggap kosong; kalau lolos, nilai USD dan return ikut jadi inf.
+    df = df.assign(close=df["close"].replace([float("inf"), float("-inf")], float("nan")))
     df = df.dropna(subset=["waktu", "close"])
     df = df.drop_duplicates("waktu").sort_values("waktu").reset_index(drop=True)
     if (df["close"] <= 0).any():
