@@ -93,7 +93,9 @@ def ringkas_transaksi(tx: dict, waktu_blok: int, tinggi: int) -> dict:
     # (tanpa prev_out, atau prev_out dengan n = 0xFFFFFFFF) dan input tanpa nilai.
     inputs = [
         i for i in tx.get("inputs") or []
-        if i.get("prev_out")
+        # Input null di respons API dilewati, bukan membuat AttributeError.
+        if isinstance(i, dict)
+        and i.get("prev_out")
         and i["prev_out"].get("value") is not None
         and i["prev_out"].get("n") != N_COINBASE
     ]
