@@ -115,3 +115,14 @@ def test_paus_waktu_sama_urutan_csv_tetap(tmp_path):
     hasil = muat_data.muat_paus(path)
     harapan = [r["txid"] for r in sorted(baris, key=lambda r: r["waktu"])]
     assert hasil["txid"].tolist() == harapan
+
+
+def test_candle_harga_inf_dibuang(tmp_path):
+    path = tmp_path / "harga.csv"
+    pd.DataFrame({
+        "waktu": ["2026-01-01 00:00", "2026-01-01 00:05", "2026-01-01 00:10"],
+        "open": [1.0, 1.0, 1.0], "high": [1.0, 1.0, 1.0], "low": [1.0, 1.0, 1.0],
+        "close": [100.0, float("inf"), 102.0], "volume": [1, 1, 1],
+    }).to_csv(path, index=False)
+    hasil = muat_data.muat_harga(path)
+    assert hasil["close"].tolist() == [100.0, 102.0]
