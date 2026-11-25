@@ -115,8 +115,9 @@ def ringkasan_reaksi(
     baris = []
     for h in horizon:
         kol = f"r_{h}m_pct"
-        r = reaksi[kol].dropna()
-        b = pembanding[kol].dropna()
+        # Return inf (harga pembagi 0) dibuang; satu saja sudah membuat rata-rata dan rasio jadi inf.
+        r = reaksi[kol].replace([float("inf"), float("-inf")], float("nan")).dropna()
+        b = pembanding[kol].replace([float("inf"), float("-inf")], float("nan")).dropna()
         rata_abs = r.abs().mean() if len(r) else float("nan")
         base_abs = b.abs().mean() if len(b) else float("nan")
         baris.append({

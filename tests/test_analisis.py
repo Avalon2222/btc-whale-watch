@@ -222,3 +222,13 @@ def test_singkat_txid_panjang_negatif():
     txid = "abcdef0123456789abcdef"
     assert analisis.singkat_txid(txid, panjang=-3) == "a…cdef"
     assert analisis.singkat_txid(txid, panjang=0) == "a…cdef"
+
+
+def test_ringkasan_reaksi_mengabaikan_return_inf():
+    reaksi = pd.DataFrame({"r_15m_pct": [float("inf"), 2.0, -1.0]})
+    pembanding = pd.DataFrame({"r_15m_pct": [1.0, float("-inf"), -1.0]})
+    ring = analisis.ringkasan_reaksi(reaksi, pembanding, horizon=(15,)).iloc[0]
+    assert ring["jumlah"] == 2
+    assert ring["rata_abs_pct"] == pytest.approx(1.5)
+    assert ring["baseline_abs_pct"] == pytest.approx(1.0)
+    assert ring["rasio_vs_baseline"] == pytest.approx(1.5)
