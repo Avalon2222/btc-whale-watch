@@ -136,3 +136,18 @@ def test_candle_waktu_ganda_pakai_yang_terbaru(tmp_path):
     }).to_csv(path, index=False)
     hasil = muat_data.muat_harga(path)
     assert hasil["close"].tolist() == [105.0, 101.0]
+
+
+def test_blok_ganda_dan_tanpa_tinggi_dibuang(tmp_path):
+    path = tmp_path / "blok.csv"
+    pd.DataFrame({
+        "tinggi": [900001, 900000, 900001, None],
+        "hash": ["b", "a", "b", "x"],
+        "waktu": ["2026-01-01 00:10", "2026-01-01 00:00", "2026-01-01 00:10", "2026-01-01 00:20"],
+        "jumlah_tx": [10, 20, 10, 5],
+        "jumlah_paus": [1, 2, 1, 0],
+        "btc_paus": [60.0, 120.0, 60.0, 0.0],
+    }).to_csv(path, index=False)
+    hasil = muat_data.muat_blok(path)
+    assert hasil["tinggi"].tolist() == [900000, 900001]
+    assert hasil["jumlah_paus"].sum() == 3
