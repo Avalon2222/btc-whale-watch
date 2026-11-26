@@ -74,4 +74,6 @@ def muat_harga(path: Path = PATH_HARGA) -> pd.DataFrame:
 def muat_blok(path: Path = PATH_BLOK) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=["waktu"])
     _periksa_kolom(df, KOLOM_BLOK, path.name)
+    # Blok yang tercatat dua kali (CSV digabung manual) membuat jumlah blok & rentang jam ikut dobel.
+    df = df.dropna(subset=["tinggi"]).drop_duplicates("tinggi", keep="last")
     return df.sort_values("tinggi").reset_index(drop=True)
