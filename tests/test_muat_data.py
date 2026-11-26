@@ -126,3 +126,13 @@ def test_candle_harga_inf_dibuang(tmp_path):
     }).to_csv(path, index=False)
     hasil = muat_data.muat_harga(path)
     assert hasil["close"].tolist() == [100.0, 102.0]
+
+
+def test_candle_waktu_ganda_pakai_yang_terbaru(tmp_path):
+    path = tmp_path / "harga.csv"
+    pd.DataFrame({
+        "waktu": ["2026-01-01 00:00", "2026-01-01 00:05", "2026-01-01 00:00"],
+        "open": 1.0, "high": 1.0, "low": 1.0, "close": [100.0, 101.0, 105.0], "volume": 1.0,
+    }).to_csv(path, index=False)
+    hasil = muat_data.muat_harga(path)
+    assert hasil["close"].tolist() == [105.0, 101.0]
