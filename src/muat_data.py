@@ -64,7 +64,8 @@ def muat_harga(path: Path = PATH_HARGA) -> pd.DataFrame:
     # Harga inf juga dianggap kosong; kalau lolos, nilai USD dan return ikut jadi inf.
     df = df.assign(close=df["close"].replace([float("inf"), float("-inf")], float("nan")))
     df = df.dropna(subset=["waktu", "close"])
-    df = df.drop_duplicates("waktu").sort_values("waktu").reset_index(drop=True)
+    # Sama seperti ambil_harga.perbarui_csv: candle yang muncul belakangan (unduhan terbaru) yang dipakai.
+    df = df.drop_duplicates("waktu", keep="last").sort_values("waktu").reset_index(drop=True)
     if (df["close"] <= 0).any():
         raise ValueError(f"{path.name}: ada harga close <= 0")
     return df
