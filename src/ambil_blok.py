@@ -81,7 +81,8 @@ def nilai_bulat(btc: float) -> bool:
     biasa hampir tidak pernah, karena sisa kembalian membuat angkanya pecahan.
     """
     try:
-        return abs(btc - round(btc)) < 1e-6
+        # 0 BTC (misalnya semua output OP_RETURN) bukan "angka bulat" khas kustodian.
+        return btc > 0 and abs(btc - round(btc)) < 1e-6
     except (TypeError, ValueError, OverflowError):  # NaN, inf, atau None bukan angka bulat
         return False
 

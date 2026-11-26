@@ -230,3 +230,9 @@ def test_output_null_dilewati():
     assert len(paus) == 1
     assert paus[0]["jumlah_output"] == 1
     assert paus[0]["total_btc"] == 60.0
+
+
+def test_nilai_bulat_nol_bukan_angka_bulat():
+    assert not ambil_blok.nilai_bulat(0.0)
+    assert not ambil_blok.nilai_bulat(-0.0)
+    assert ambil_blok.nilai_bulat(1.0)
