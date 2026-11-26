@@ -236,3 +236,9 @@ def test_nilai_bulat_nol_bukan_angka_bulat():
     assert not ambil_blok.nilai_bulat(0.0)
     assert not ambil_blok.nilai_bulat(-0.0)
     assert ambil_blok.nilai_bulat(1.0)
+
+
+def test_saring_paus_melewati_transaksi_null():
+    besar = buat_tx("besar", [120], [100, 19.9])
+    hasil = ambil_blok.saring_paus(buat_blok([None, besar, "rusak"]), ambang_btc=50)
+    assert [p["txid"] for p in hasil] == ["besar"]

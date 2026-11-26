@@ -130,6 +130,9 @@ def saring_paus(blok: dict, ambang_btc: float = AMBANG_SIMPAN_BTC) -> list[dict]
     """
     hasil = []
     for tx in blok.get("tx") or []:
+        # Transaksi null di respons API dilewati, sama seperti input/output null.
+        if not isinstance(tx, dict):
+            continue
         # Samakan dengan ringkas_transaksi: value None atau "out" None dianggap 0.
         total_out = sum(o.get("value") or 0 for o in tx.get("out") or [] if isinstance(o, dict)) / SATOSHI
         if total_out >= ambang_btc:
