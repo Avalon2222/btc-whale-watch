@@ -56,6 +56,9 @@ def muat_paus(path: Path = PATH_PAUS, ambang_btc: float = 0.0) -> pd.DataFrame:
     df["alamat_terbesar"] = df["alamat_terbesar"].fillna("")
     # NaN.astype(bool) jadi True, dan teks "False"/"0" juga jadi True; baca maknanya, bukan isinya ada atau tidak.
     df["bulat"] = df["bulat"].map(_bendera)
+    # total_btc berupa teks rusak atau inf dibuang; inf membuat nilai USD dan peringkat paus kacau.
+    total = pd.to_numeric(df["total_btc"], errors="coerce").replace([float("inf"), float("-inf")], float("nan"))
+    df = df.assign(total_btc=total)
     df = df[df["total_btc"] >= ambang_btc]
     # txid yang sama tercatat dua kali (misalnya hasil gabung CSV manual) tidak boleh dihitung ganda.
     df = df.drop_duplicates("txid")
