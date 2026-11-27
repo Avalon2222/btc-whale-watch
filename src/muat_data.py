@@ -34,6 +34,13 @@ def _periksa_kolom(df: pd.DataFrame, kolom: list[str], nama: str) -> None:
         raise ValueError(f"{nama}: kolom {hilang} tidak ditemukan. Kolom yang ada: {list(df.columns)}")
 
 
+def _bendera(nilai: object) -> bool:
+    """Bendera CSV jadi bool: True/"true"/"1"/"ya" -> True, selain itu (termasuk kosong) -> False."""
+    if isinstance(nilai, str):
+        return nilai.strip().lower() in {"true", "1", "1.0", "ya", "yes"}
+    return bool(nilai) if pd.notna(nilai) else False
+
+
 def muat_paus(path: Path = PATH_PAUS, ambang_btc: float = 0.0) -> pd.DataFrame:
     """Baca transaksi paus, urut berdasarkan waktu, saring >= ambang_btc."""
     df = pd.read_csv(path, parse_dates=["waktu"])
@@ -47,8 +54,8 @@ def muat_paus(path: Path = PATH_PAUS, ambang_btc: float = 0.0) -> pd.DataFrame:
         raise ValueError(f"{path.name}: pola tidak dikenal {sorted(salah)}; yang boleh {POLA_VALID}")
     df["pola"] = df["pola"].astype(str)
     df["alamat_terbesar"] = df["alamat_terbesar"].fillna("")
-    # NaN.astype(bool) jadi True, jadi nilai kosong diisi False dulu.
-    df["bulat"] = df["bulat"].fillna(False).astype(bool)
+    # NaN.astype(bool) jadi True, dan teks "False"/"0" juga jadi True; baca maknanya, bukan isinya ada atau tidak.
+    df["bulat"] = df["bulat"].map(_bendera)
     df = df[df["total_btc"] >= ambang_btc]
     # txid yang sama tercatat dua kali (misalnya hasil gabung CSV manual) tidak boleh dihitung ganda.
     df = df.drop_duplicates("txid")
