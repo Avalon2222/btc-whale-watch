@@ -176,3 +176,14 @@ def test_total_btc_inf_atau_teks_dibuang(tmp_path):
     hasil = muat_data.muat_paus(path, ambang_btc=100)
     assert hasil["txid"].tolist() == ["a"]
     assert hasil["total_btc"].tolist() == [150.0]
+
+
+def test_candle_harga_teks_rusak_dibuang(tmp_path):
+    path = tmp_path / "harga.csv"
+    pd.DataFrame({
+        "waktu": ["2026-01-01 00:00", "2026-01-01 00:05", "2026-01-01 00:10"],
+        "open": [1.0, 1.0, 1.0], "high": [1.0, 1.0, 1.0], "low": [1.0, 1.0, 1.0],
+        "close": ["100.0", "-", "102.5"], "volume": [1, 1, 1],
+    }).to_csv(path, index=False)
+    hasil = muat_data.muat_harga(path)
+    assert hasil["close"].tolist() == [100.0, 102.5]

@@ -72,7 +72,9 @@ def muat_harga(path: Path = PATH_HARGA) -> pd.DataFrame:
     _periksa_kolom(df, KOLOM_HARGA, path.name)
     # Candle tanpa waktu atau tanpa harga tidak bisa dipakai merge_asof.
     # Harga inf juga dianggap kosong; kalau lolos, nilai USD dan return ikut jadi inf.
-    df = df.assign(close=df["close"].replace([float("inf"), float("-inf")], float("nan")))
+    # Teks rusak ("-", "n.a.") juga dianggap kosong; kalau tidak, cek close <= 0 di bawah gagal dengan TypeError.
+    close = pd.to_numeric(df["close"], errors="coerce")
+    df = df.assign(close=close.replace([float("inf"), float("-inf")], float("nan")))
     df = df.dropna(subset=["waktu", "close"])
     # Sama seperti ambil_harga.perbarui_csv: candle yang muncul belakangan (unduhan terbaru) yang dipakai.
     df = df.drop_duplicates("waktu", keep="last").sort_values("waktu").reset_index(drop=True)
