@@ -151,3 +151,15 @@ def test_blok_ganda_dan_tanpa_tinggi_dibuang(tmp_path):
     hasil = muat_data.muat_blok(path)
     assert hasil["tinggi"].tolist() == [900000, 900001]
     assert hasil["jumlah_paus"].sum() == 3
+
+
+def test_bulat_teks_false_atau_nol_tetap_false(tmp_path):
+    df = pd.DataFrame([{k: 0 for k in muat_data.KOLOM_PAUS} for _ in range(4)])
+    df["txid"] = ["a", "b", "c", "d"]
+    df["waktu"] = "2026-01-01 00:00:00"
+    df["pola"] = "transfer"
+    df["bulat"] = ["True", "0", "false", None]
+    path = tmp_path / "paus.csv"
+    df.to_csv(path, index=False)
+    hasil = muat_data.muat_paus(path)
+    assert hasil.set_index("txid")["bulat"].to_dict() == {"a": True, "b": False, "c": False, "d": False}
