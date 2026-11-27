@@ -163,3 +163,16 @@ def test_bulat_teks_false_atau_nol_tetap_false(tmp_path):
     df.to_csv(path, index=False)
     hasil = muat_data.muat_paus(path)
     assert hasil.set_index("txid")["bulat"].to_dict() == {"a": True, "b": False, "c": False, "d": False}
+
+
+def test_total_btc_inf_atau_teks_dibuang(tmp_path):
+    df = pd.DataFrame([{k: 0 for k in muat_data.KOLOM_PAUS} for _ in range(3)])
+    df["txid"] = ["a", "b", "c"]
+    df["waktu"] = "2026-01-01 00:00:00"
+    df["pola"] = "transfer"
+    df["total_btc"] = ["150", "inf", "rusak"]
+    path = tmp_path / "paus.csv"
+    df.to_csv(path, index=False)
+    hasil = muat_data.muat_paus(path, ambang_btc=100)
+    assert hasil["txid"].tolist() == ["a"]
+    assert hasil["total_btc"].tolist() == [150.0]
