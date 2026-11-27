@@ -138,6 +138,8 @@ def ringkasan_per_pola(reaksi: pd.DataFrame, horizon_menit: int = 60) -> pd.Data
     kol = f"r_{horizon_menit}m_pct"
     if reaksi.empty:
         return pd.DataFrame(columns=["pola", "jumlah", "total_btc", "rata_rata_pct", "persen_naik"])
+    # Return inf (harga pembagi 0) dibuang seperti di ringkasan_reaksi, supaya rata-rata pola tidak jadi inf.
+    reaksi = reaksi.assign(**{kol: reaksi[kol].replace([float("inf"), float("-inf")], float("nan"))})
     g = reaksi.groupby("pola")
     hasil = pd.DataFrame({
         "jumlah": g.size(),
