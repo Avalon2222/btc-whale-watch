@@ -232,3 +232,14 @@ def test_ringkasan_reaksi_mengabaikan_return_inf():
     assert ring["rata_abs_pct"] == pytest.approx(1.5)
     assert ring["baseline_abs_pct"] == pytest.approx(1.0)
     assert ring["rasio_vs_baseline"] == pytest.approx(1.5)
+
+
+def test_ringkasan_per_pola_return_inf_dibuang():
+    reaksi = pd.DataFrame({
+        "pola": ["transfer", "transfer", "transfer"],
+        "total_btc": [100.0, 200.0, 300.0],
+        "r_60m_pct": [1.0, float("inf"), -3.0],
+    })
+    baris = analisis.ringkasan_per_pola(reaksi, horizon_menit=60).iloc[0]
+    assert baris["rata_rata_pct"] == pytest.approx(-1.0)
+    assert baris["persen_naik"] == pytest.approx(50.0)
