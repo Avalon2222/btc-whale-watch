@@ -93,5 +93,8 @@ def muat_blok(path: Path = PATH_BLOK) -> pd.DataFrame:
     df = pd.read_csv(path, parse_dates=["waktu"])
     _periksa_kolom(df, KOLOM_BLOK, path.name)
     # Blok yang tercatat dua kali (CSV digabung manual) membuat jumlah blok & rentang jam ikut dobel.
+    # Tinggi berupa teks ("x") membuat urutannya menurut abjad ("10" < "9"); jadikan angka dulu.
+    df = df.assign(tinggi=pd.to_numeric(df["tinggi"], errors="coerce"))
     df = df.dropna(subset=["tinggi"]).drop_duplicates("tinggi", keep="last")
+    df["tinggi"] = df["tinggi"].astype(int)
     return df.sort_values("tinggi").reset_index(drop=True)
