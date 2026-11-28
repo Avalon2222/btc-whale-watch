@@ -209,3 +209,16 @@ def test_paus_waktu_teks_rusak_dibuang(tmp_path):
     hasil = muat_data.muat_paus(path)
     assert pd.api.types.is_datetime64_any_dtype(hasil["waktu"])
     assert hasil["txid"].tolist() == ["t0", "t2"]
+
+
+def test_blok_tinggi_teks_dibuang_dan_urut_angka(tmp_path):
+    path = tmp_path / "blok.csv"
+    pd.DataFrame({
+        "tinggi": ["900010", "x", "900009"],
+        "hash": ["b", "y", "a"],
+        "waktu": ["2026-01-01 00:10", "2026-01-01 00:20", "2026-01-01 00:00"],
+        "jumlah_tx": [10, 5, 20], "jumlah_paus": [1, 0, 2], "btc_paus": [60.0, 0.0, 120.0],
+    }).to_csv(path, index=False)
+    hasil = muat_data.muat_blok(path)
+    assert hasil["tinggi"].tolist() == [900009, 900010]
+    assert hasil["hash"].tolist() == ["a", "b"]
