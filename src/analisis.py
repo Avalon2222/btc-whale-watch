@@ -221,6 +221,10 @@ def singkat_txid(txid: str, panjang: int = 8) -> str:
     """Potong txid panjang jadi `abcd1234…wxyz` supaya muat di tabel."""
     if not isinstance(txid, str):
         return "-"
+    # Spasi di ujung (CSV diedit tangan) ikut terpotong ke dalam label dan membuat ekornya "…xyz ".
+    txid = txid.strip()
+    if not txid:
+        return "-"
     # Panjang nol/negatif lewat slicing [:panjang] memotong dari belakang dan hasilnya kacau.
     panjang = max(panjang, 1)
     return f"{txid[:panjang]}…{txid[-4:]}" if len(txid) > panjang + 5 else txid

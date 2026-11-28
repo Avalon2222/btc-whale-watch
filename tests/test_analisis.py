@@ -243,3 +243,9 @@ def test_ringkasan_per_pola_return_inf_dibuang():
     baris = analisis.ringkasan_per_pola(reaksi, horizon_menit=60).iloc[0]
     assert baris["rata_rata_pct"] == pytest.approx(-1.0)
     assert baris["persen_naik"] == pytest.approx(50.0)
+
+
+def test_singkat_txid_spasi_di_ujung_dibersihkan():
+    assert analisis.singkat_txid(" abcdefghijklmnopqrstuvwxyz ") == "abcdefgh…wxyz"
+    assert analisis.singkat_txid("  abc  ") == "abc"
+    assert analisis.singkat_txid("   ") == "-"
