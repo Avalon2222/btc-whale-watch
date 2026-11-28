@@ -187,3 +187,15 @@ def test_candle_harga_teks_rusak_dibuang(tmp_path):
     }).to_csv(path, index=False)
     hasil = muat_data.muat_harga(path)
     assert hasil["close"].tolist() == [100.0, 102.5]
+
+
+def test_candle_waktu_teks_rusak_dibuang(tmp_path):
+    path = tmp_path / "harga.csv"
+    pd.DataFrame({
+        "waktu": ["2026-01-01 00:00", "kapan?", "2026-01-01 00:10"],
+        "open": [1.0, 1.0, 1.0], "high": [1.0, 1.0, 1.0], "low": [1.0, 1.0, 1.0],
+        "close": [100.0, 101.0, 102.5], "volume": [1, 1, 1],
+    }).to_csv(path, index=False)
+    hasil = muat_data.muat_harga(path)
+    assert pd.api.types.is_datetime64_any_dtype(hasil["waktu"])
+    assert hasil["close"].tolist() == [100.0, 102.5]

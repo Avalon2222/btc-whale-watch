@@ -74,7 +74,10 @@ def muat_harga(path: Path = PATH_HARGA) -> pd.DataFrame:
     # Harga inf juga dianggap kosong; kalau lolos, nilai USD dan return ikut jadi inf.
     # Teks rusak ("-", "n.a.") juga dianggap kosong; kalau tidak, cek close <= 0 di bawah gagal dengan TypeError.
     close = pd.to_numeric(df["close"], errors="coerce")
-    df = df.assign(close=close.replace([float("inf"), float("-inf")], float("nan")))
+    # Satu waktu yang rusak membuat read_csv menyerah dan menyimpan seluruh kolom sebagai teks,
+    # sehingga merge_asof di analisis gagal; ubah per nilai dan buang yang tidak terbaca.
+    waktu = pd.to_datetime(df["waktu"], errors="coerce")
+    df = df.assign(waktu=waktu, close=close.replace([float("inf"), float("-inf")], float("nan")))
     df = df.dropna(subset=["waktu", "close"])
     # Sama seperti ambil_harga.perbarui_csv: candle yang muncul belakangan (unduhan terbaru) yang dipakai.
     df = df.drop_duplicates("waktu", keep="last").sort_values("waktu").reset_index(drop=True)
