@@ -45,6 +45,9 @@ def muat_paus(path: Path = PATH_PAUS, ambang_btc: float = 0.0) -> pd.DataFrame:
     """Baca transaksi paus, urut berdasarkan waktu, saring >= ambang_btc."""
     df = pd.read_csv(path, parse_dates=["waktu"])
     _periksa_kolom(df, KOLOM_PAUS, path.name)
+    # Waktu yang rusak membuat kolomnya tersimpan sebagai teks dan hitung_reaksi gagal;
+    # transaksi tanpa waktu tidak bisa disandingkan dengan harga, jadi dibuang.
+    df = df.assign(waktu=pd.to_datetime(df["waktu"], errors="coerce")).dropna(subset=["waktu"])
     # Pola dirapikan dulu (spasi, huruf besar) supaya " Transfer" tidak dianggap pola baru.
     df["pola"] = df["pola"].astype("string").str.strip().str.lower()
     salah = set(df["pola"].dropna().unique()) - set(POLA_VALID)
