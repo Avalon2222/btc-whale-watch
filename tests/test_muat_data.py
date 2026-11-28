@@ -199,3 +199,13 @@ def test_candle_waktu_teks_rusak_dibuang(tmp_path):
     hasil = muat_data.muat_harga(path)
     assert pd.api.types.is_datetime64_any_dtype(hasil["waktu"])
     assert hasil["close"].tolist() == [100.0, 102.5]
+
+
+def test_paus_waktu_teks_rusak_dibuang(tmp_path):
+    path = _tulis_paus(tmp_path, ["transfer", "transfer", "transfer"])
+    df = pd.read_csv(path)
+    df["waktu"] = ["2026-01-01 00:00:00", "entah", "2026-01-01 00:10:00"]
+    df.to_csv(path, index=False)
+    hasil = muat_data.muat_paus(path)
+    assert pd.api.types.is_datetime64_any_dtype(hasil["waktu"])
+    assert hasil["txid"].tolist() == ["t0", "t2"]
